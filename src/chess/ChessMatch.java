@@ -25,10 +25,14 @@ public class ChessMatch {
 	}
 	
 	private void initialSetup() {
-		board.placePiece(new Rook(board, Color.WHITE), new Position(3,3));
-		board.placePiece(new Rook(board, Color.BLACK), new Position(3,4));
-		board.placePiece(new King(board, Color.WHITE), new Position(7,3));
-		board.placePiece(new King(board, Color.BLACK), new Position(0,3));
+		ChessPosition chessPosition = new ChessPosition(5, 'd');
+		board.placePiece(new Rook(board, Color.WHITE), chessPosition.toPosition());
+		chessPosition = new ChessPosition(5, 'e');
+		board.placePiece(new Rook(board, Color.BLACK), chessPosition.toPosition());
+		chessPosition = new ChessPosition(1, 'd');
+		board.placePiece(new King(board, Color.WHITE), chessPosition.toPosition());
+		chessPosition = new ChessPosition(8, 'd');
+		board.placePiece(new King(board, Color.BLACK), chessPosition.toPosition());
 	}
 
 }
