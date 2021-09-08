@@ -1,6 +1,7 @@
 package chess;
 
 import boardgame.Board;
+import boardgame.Piece;
 import chess.pieces.King;
 import chess.pieces.Rook;
 
@@ -32,6 +33,19 @@ public class ChessMatch {
 		board.placePiece(new King(board, Color.WHITE), chessPosition.toPosition());
 		chessPosition = new ChessPosition(8, 'd');
 		board.placePiece(new King(board, Color.BLACK), chessPosition.toPosition());
+	}
+	
+	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
+		ChessPiece chessPiece = null;
+		Piece piece = board.removePiece(sourcePosition.toPosition());
+		if (!board.positionExists(targetPosition.toPosition())) {
+			throw new ChessException("Target position does not exist");
+		}
+		if (board.thereIsAPiece(targetPosition.toPosition())) {
+			chessPiece = (ChessPiece) board.removePiece(targetPosition.toPosition()); 
+		}
+		board.placePiece(piece, targetPosition.toPosition());
+		return chessPiece;
 	}
 
 }

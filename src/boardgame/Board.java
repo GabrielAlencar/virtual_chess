@@ -48,6 +48,18 @@ public class Board {
 		piece.position = position;
 	}
 	
+	public Piece removePiece(Position position) {
+		if (!positionExists(position)) {
+			throw new BoardException("Error removing piece on board: row or column out of range");
+		}
+		if (!thereIsAPiece(position)) {
+			throw new BoardException("Error removing piece on board: there is no piece on position " + position);
+		}
+		Piece piece = pieces[position.getRow()][position.getColumn()];
+		pieces[position.getRow()][position.getColumn()] = null;
+		return piece;
+	}
+	
 	private boolean positionExists(Integer row, Integer column) {
 		if (row >= 0 && row < rows && column >= 0 && column < columns) {
 			return true;

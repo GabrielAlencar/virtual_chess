@@ -1,7 +1,7 @@
 package application;
 
-import boardgame.Piece;
 import chess.ChessPiece;
+import chess.ChessPosition;
 import chess.Color;
 
 public class UI {
@@ -43,11 +43,11 @@ public class UI {
 		}
 	}
 	
-	private static void printPiece(Piece piece) {
+	private static void printPiece(ChessPiece piece) {
 		if (piece == null) {
 			System.out.printf("-");
 		} else {
-			if (((ChessPiece)piece).getColor() == Color.WHITE) {
+			if (piece.getColor() == Color.WHITE) {
 				System.out.printf("%s%s%s", ANSI_WHITE, piece.toString(), ANSI_RESET);
 			} else {
 				System.out.printf("%s%s%s", ANSI_YELLOW, piece.toString(), ANSI_RESET);
@@ -55,4 +55,11 @@ public class UI {
 			//System.out.printf("%s", piece.toString());
 		}
 	}
+	
+	public static ChessPosition readChessPosition(String coordinate) {
+		char column = coordinate.charAt(0);
+		int row = Integer.parseInt(coordinate.substring(1));
+		return new ChessPosition(row, column);
+	}
+
 }
