@@ -37,6 +37,12 @@ public class ChessMatch {
 	
 	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
 		ChessPiece chessPiece = null;
+		if (!board.positionExists(sourcePosition.toPosition())) {
+			throw new ChessException("Source position does not exist");
+		}
+		if (!board.piece(sourcePosition.toPosition()).isThereAnyPossibleMove()) {
+			throw new ChessException("The selected piece has no possible moves");
+		}
 		Piece piece = board.removePiece(sourcePosition.toPosition());
 		if (!board.positionExists(targetPosition.toPosition())) {
 			throw new ChessException("Target position does not exist");

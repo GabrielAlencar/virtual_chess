@@ -44,7 +44,7 @@ public class Program {
 				System.out.printf("Pressione ENTER para continuar");
 				sc.nextLine();
 			} finally {
-				System.out.printf("%nDeseja continaur jogando (s/n)/ ");
+				System.out.printf("%nDeseja continaur jogando (s/n)? ");
 				answer = sc.nextLine().charAt(0);
 			}
 		} 
