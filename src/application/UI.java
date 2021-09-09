@@ -30,6 +30,24 @@ public class UI {
 		System.out.flush();
 	}
 	
+	public static void printBoard(ChessPiece[][] chessPieces, boolean[][] possibleMoves) {
+		for (int i = 0; i < chessPieces.length; i++) {
+			System.out.printf("%d ", chessPieces.length - i);
+			for (int j = 0; j < chessPieces[0].length; j++) {
+				printPieceWithBackground(chessPieces[i][j], possibleMoves[i][j]);
+				System.out.printf(" ");
+			}
+			System.out.println();
+		}
+		
+		System.out.printf("  ");
+		char letter = 'a';
+		for (int i = 0; i < chessPieces.length; i++) {
+			System.out.printf("%c ", letter);
+			letter++;
+		}
+	}
+	
 	public static void printBoard(ChessPiece[][] chessPieces) {
 		for (int i = 0; i < chessPieces.length; i++) {
 			System.out.printf("%d ", chessPieces.length - i);
@@ -57,7 +75,21 @@ public class UI {
 			} else {
 				System.out.printf("%s%s%s", ANSI_YELLOW, piece.toString(), ANSI_RESET);
 			}
-			//System.out.printf("%s", piece.toString());
+		}
+	}
+	
+	private static void printPieceWithBackground(ChessPiece piece, boolean background) {
+		if (background) {
+			System.out.printf("%s", ANSI_BLUE_BACKGROUND);
+		}
+		if (piece == null) {
+			System.out.printf("-%s", ANSI_RESET);
+		} else {
+			if (piece.getColor() == Color.WHITE) {
+				System.out.printf("%s%s%s", ANSI_WHITE, piece.toString(), ANSI_RESET);
+			} else {
+				System.out.printf("%s%s%s", ANSI_YELLOW, piece.toString(), ANSI_RESET);
+			}
 		}
 	}
 	

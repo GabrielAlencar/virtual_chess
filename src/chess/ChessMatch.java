@@ -33,6 +33,8 @@ public class ChessMatch {
 		board.placePiece(new King(board, Color.WHITE), chessPosition.toPosition());
 		chessPosition = new ChessPosition(8, 'd');
 		board.placePiece(new King(board, Color.BLACK), chessPosition.toPosition());
+		
+		System.out.println(((ChessPiece)board.piece(new ChessPosition(5, 'd').toPosition())).isThereOpponentPiece(new ChessPosition(8, 'd').toPosition()));
 	}
 	
 	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
@@ -40,18 +42,34 @@ public class ChessMatch {
 		if (!board.positionExists(sourcePosition.toPosition())) {
 			throw new ChessException("Source position does not exist");
 		}
+		if (!board.thereIsAPiece(sourcePosition.toPosition())) {
+			throw new ChessException("There is no piece on source position");
+		}
 		if (!board.piece(sourcePosition.toPosition()).isThereAnyPossibleMove()) {
 			throw new ChessException("The selected piece has no possible moves");
 		}
-		Piece piece = board.removePiece(sourcePosition.toPosition());
 		if (!board.positionExists(targetPosition.toPosition())) {
 			throw new ChessException("Target position does not exist");
 		}
-		if (board.thereIsAPiece(targetPosition.toPosition())) {
-			chessPiece = (ChessPiece) board.removePiece(targetPosition.toPosition()); 
+		if (!board.piece(sourcePosition.toPosition()).possibleMove(targetPosition.toPosition())) {
+			throw new ChessException("Target position is not a possible move");
 		}
+		Piece piece = board.removePiece(sourcePosition.toPosition());
+		if (board.thereIsAPiece(targetPosition.toPosition())) {
+			chessPiece = (ChessPiece) board.removePiece(targetPosition.toPosition());
+		} 
 		board.placePiece(piece, targetPosition.toPosition());
 		return chessPiece;
+	}
+	
+	public boolean[][] getPossibleMoves(ChessPosition chessPosition) {
+		if (!board.positionExists(chessPosition.toPosition())) {
+			throw new ChessException("Chess position does not exist");
+		}
+		if (!board.thereIsAPiece(chessPosition.toPosition())) {
+			throw new ChessException("There is no piece on coordinate: " + chessPosition);
+		}
+		return board.piece(chessPosition.toPosition()).possibleMoves();
 	}
 
 }
