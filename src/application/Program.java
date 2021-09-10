@@ -13,38 +13,42 @@ public class Program {
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		ChessMatch chessMatch = new ChessMatch();
-		char answer = 's';
+		char answer = 'y';
 
-		while(answer == 's') {
+		while(answer == 'y') {
 			try {
 				UI.clearScreen();
 				ChessPiece[][] chessPieces = chessMatch.getPieces();
+				System.out.printf("Turn: %d%n", chessMatch.getTurn());
+				System.out.printf("Current player: %s%n%n", chessMatch.getCurrentPlayer());
 				UI.printBoard(chessPieces);
 				System.out.println("\n");
-				System.out.printf("Digite a coordenada da peca que deve ser movida: ");
+				System.out.printf("Source position: ");
 				String sourceCoordinate = sc.nextLine();
 				ChessPosition source = UI.readChessPosition(sourceCoordinate);
 				boolean[][] possibleMoves = chessMatch.getPossibleMoves(source);
 				UI.clearScreen();
+				System.out.printf("Turn: %d%n", chessMatch.getTurn());
+				System.out.printf("Current player: %s%n%n", chessMatch.getCurrentPlayer());
 				UI.printBoard(chessPieces, possibleMoves);
 				System.out.println("\n");
-				System.out.printf("Coordenada da peca a ser movida: %s%n", sourceCoordinate);
-				System.out.printf("Digite a coordenada alvo da peca a ser movida: ");
+				System.out.printf("Source position: %s%n", sourceCoordinate);
+				System.out.printf("Target position: ");
 				String targetCoordinate = sc.nextLine();
 				ChessPiece chessPiece = chessMatch.performChessMove(source, UI.readChessPosition(targetCoordinate));
 				if (chessPiece != null) {
-					System.out.printf("%nPeca capturada: %s%n", chessPiece.toString());
+					System.out.printf("%nCaptured piece: %s%n", chessPiece.toString());
 				}
 			} catch (BoardException e) {
 				System.out.printf("%s%n", e.getMessage());
 			} catch (ChessException e) {
 				System.out.printf("%s%n", e.getMessage());
 			} catch (RuntimeException e) {
-				System.out.printf("Erro inesperado%n");
+				System.out.printf("Unexpected error%n");
 			} catch (Exception e) {
-				System.out.printf("Erro inesperado%n");
+				System.out.printf("Unexpected error%n");
 			} finally {
-				System.out.printf("%nDeseja continaur jogando (s/n)? ");
+				System.out.printf("%nDo you wish to keep playing (y/n)? ");
 				answer = sc.nextLine().charAt(0);
 			}
 		}
