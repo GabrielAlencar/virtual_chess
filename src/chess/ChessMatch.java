@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import boardgame.Board;
 import boardgame.Piece;
 import chess.pieces.King;
@@ -10,6 +13,11 @@ public class ChessMatch {
 	private int turn;
 	private Color currentPlayer;
 	private Board board;
+	
+	private List<ChessPiece> blackPiecesOnTheBoard = new ArrayList<>();
+	private List<ChessPiece> whitePiecesOnTheBoard = new ArrayList<>();
+	private List<ChessPiece> capturedBlackPieces = new ArrayList<>();
+	private List<ChessPiece> capturedWhitePieces = new ArrayList<>();
 	
 	public ChessMatch() {
 		board = new Board(8, 8);
@@ -38,13 +46,21 @@ public class ChessMatch {
 	
 	private void initialSetup() {
 		ChessPosition chessPosition = new ChessPosition(1, 'a');
-		board.placePiece(new Rook(board, Color.WHITE), chessPosition.toPosition());
-		chessPosition = new ChessPosition(8, 'a');
-		board.placePiece(new Rook(board, Color.BLACK), chessPosition.toPosition());
+		Rook leftWhiteRook = new Rook(board, Color.WHITE);
+		board.placePiece(leftWhiteRook, chessPosition.toPosition());
+		whitePiecesOnTheBoard.add(leftWhiteRook);
 		chessPosition = new ChessPosition(1, 'd');
-		board.placePiece(new King(board, Color.WHITE), chessPosition.toPosition());
+		King whiteKing = new King(board, Color.WHITE);
+		board.placePiece(whiteKing, chessPosition.toPosition());
+		whitePiecesOnTheBoard.add(whiteKing);
+		chessPosition = new ChessPosition(8, 'a');
+		Rook leftBlackRook = new Rook(board, Color.BLACK);
+		board.placePiece(leftBlackRook, chessPosition.toPosition());
+		blackPiecesOnTheBoard.add(leftBlackRook);
 		chessPosition = new ChessPosition(8, 'd');
-		board.placePiece(new King(board, Color.BLACK), chessPosition.toPosition());
+		King blackKing = new King(board, Color.BLACK);
+		board.placePiece(blackKing, chessPosition.toPosition());
+		blackPiecesOnTheBoard.add(blackKing);
 	}
 	
 	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
@@ -98,6 +114,38 @@ public class ChessMatch {
 		} else {
 			currentPlayer = Color.WHITE;
 		}
+	}
+	
+	public void capturePiece(ChessPiece chessPiece) {
+		if (chessPiece != null) {
+			if(chessPiece.getColor() == Color.WHITE) {
+				capturedWhitePieces.add(chessPiece);
+				whitePiecesOnTheBoard.remove(chessPiece);
+			} else {
+				capturedBlackPieces.add(chessPiece);
+				blackPiecesOnTheBoard.remove(chessPiece);
+			}
+		}
+	}
+	
+	public String getCapturedPieces() {
+		StringBuilder sb = new StringBuilder();
+		if (currentPlayer == Color.WHITE) {
+			for (int i = 0; i < capturedBlackPieces.size(); i++) {
+				sb.append(capturedBlackPieces.get(i).toString());
+				if (i < capturedBlackPieces.size() - 1) {
+					sb.append(", ");
+				}
+			}
+		} else {
+			for (int i = 0; i < capturedWhitePieces.size(); i++) {
+				sb.append(capturedWhitePieces.get(i).toString());
+				if (i < capturedWhitePieces.size() - 1) {
+					sb.append(", ");
+				}
+			}
+		}
+		return sb.toString();
 	}
 
 }

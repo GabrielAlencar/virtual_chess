@@ -98,5 +98,14 @@ public class UI {
 		int row = Integer.parseInt(coordinate.substring(1));
 		return new ChessPosition(row, column);
 	}
+	
+	public static void printCapturedPieces(String pieces, Color currentPlayer) {
+		if (currentPlayer == Color.WHITE) {
+			System.out.printf("Captured pieces: %s%s%s%n", ANSI_YELLOW, pieces, ANSI_RESET);
+		} else {
+			System.out.printf("Captured pieces: %s%s%s%n", ANSI_WHITE, pieces, ANSI_RESET);
+		}
+		
+	}
 
 }

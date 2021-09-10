@@ -20,7 +20,9 @@ public class Program {
 				UI.clearScreen();
 				ChessPiece[][] chessPieces = chessMatch.getPieces();
 				System.out.printf("Turn: %d%n", chessMatch.getTurn());
-				System.out.printf("Current player: %s%n%n", chessMatch.getCurrentPlayer());
+				System.out.printf("Current player: %s%n", chessMatch.getCurrentPlayer());
+				UI.printCapturedPieces(chessMatch.getCapturedPieces(), chessMatch.getCurrentPlayer());
+				System.out.println();
 				UI.printBoard(chessPieces);
 				System.out.println("\n");
 				System.out.printf("Source position: ");
@@ -29,16 +31,15 @@ public class Program {
 				boolean[][] possibleMoves = chessMatch.getPossibleMoves(source);
 				UI.clearScreen();
 				System.out.printf("Turn: %d%n", chessMatch.getTurn());
-				System.out.printf("Current player: %s%n%n", chessMatch.getCurrentPlayer());
+				System.out.printf("Current player: %s%n", chessMatch.getCurrentPlayer());
+				UI.printCapturedPieces(chessMatch.getCapturedPieces(), chessMatch.getCurrentPlayer());
+				System.out.println();
 				UI.printBoard(chessPieces, possibleMoves);
 				System.out.println("\n");
 				System.out.printf("Source position: %s%n", sourceCoordinate);
 				System.out.printf("Target position: ");
 				String targetCoordinate = sc.nextLine();
-				ChessPiece chessPiece = chessMatch.performChessMove(source, UI.readChessPosition(targetCoordinate));
-				if (chessPiece != null) {
-					System.out.printf("%nCaptured piece: %s%n", chessPiece.toString());
-				}
+				chessMatch.capturePiece(chessMatch.performChessMove(source, UI.readChessPosition(targetCoordinate)));
 			} catch (BoardException e) {
 				System.out.printf("%s%n", e.getMessage());
 			} catch (ChessException e) {
