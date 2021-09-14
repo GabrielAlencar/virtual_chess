@@ -24,6 +24,9 @@ public class Program {
 				UI.printCapturedPieces(chessMatch.getCapturedPieces(), chessMatch.getCurrentPlayer());
 				System.out.println();
 				UI.printBoard(chessPieces);
+				if (chessMatch.check()) {
+					System.out.printf("%n%nYou are in check");
+				}
 				System.out.println("\n");
 				System.out.printf("Source position: ");
 				String sourceCoordinate = sc.nextLine();
@@ -35,6 +38,9 @@ public class Program {
 				UI.printCapturedPieces(chessMatch.getCapturedPieces(), chessMatch.getCurrentPlayer());
 				System.out.println();
 				UI.printBoard(chessPieces, possibleMoves);
+				if (chessMatch.check()) {
+					System.out.printf("%n%nYou are in check");
+				}
 				System.out.println("\n");
 				System.out.printf("Source position: %s%n", sourceCoordinate);
 				System.out.printf("Target position: ");

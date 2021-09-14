@@ -5,6 +5,7 @@ import java.util.List;
 
 import boardgame.Board;
 import boardgame.Piece;
+import boardgame.Position;
 import chess.pieces.King;
 import chess.pieces.Rook;
 
@@ -18,6 +19,8 @@ public class ChessMatch {
 	private List<ChessPiece> whitePiecesOnTheBoard = new ArrayList<>();
 	private List<ChessPiece> capturedBlackPieces = new ArrayList<>();
 	private List<ChessPiece> capturedWhitePieces = new ArrayList<>();
+	private Position blackKingReference;
+	private Position whiteKingReference;
 	
 	public ChessMatch() {
 		board = new Board(8, 8);
@@ -49,16 +52,26 @@ public class ChessMatch {
 		Rook leftWhiteRook = new Rook(board, Color.WHITE);
 		board.placePiece(leftWhiteRook, chessPosition.toPosition());
 		whitePiecesOnTheBoard.add(leftWhiteRook);
+		chessPosition = new ChessPosition(1, 'h');
+		Rook rightWhiteRook = new Rook(board, Color.WHITE);
+		board.placePiece(rightWhiteRook, chessPosition.toPosition());
+		whitePiecesOnTheBoard.add(rightWhiteRook);
 		chessPosition = new ChessPosition(1, 'd');
 		King whiteKing = new King(board, Color.WHITE);
+		whiteKingReference = chessPosition.toPosition();
 		board.placePiece(whiteKing, chessPosition.toPosition());
 		whitePiecesOnTheBoard.add(whiteKing);
 		chessPosition = new ChessPosition(8, 'a');
 		Rook leftBlackRook = new Rook(board, Color.BLACK);
 		board.placePiece(leftBlackRook, chessPosition.toPosition());
 		blackPiecesOnTheBoard.add(leftBlackRook);
+		chessPosition = new ChessPosition(8, 'h');
+		Rook rightBlackRook = new Rook(board, Color.BLACK);
+		board.placePiece(rightBlackRook, chessPosition.toPosition());
+		blackPiecesOnTheBoard.add(rightBlackRook);
 		chessPosition = new ChessPosition(8, 'd');
 		King blackKing = new King(board, Color.BLACK);
+		blackKingReference = chessPosition.toPosition();
 		board.placePiece(blackKing, chessPosition.toPosition());
 		blackPiecesOnTheBoard.add(blackKing);
 	}
@@ -87,8 +100,14 @@ public class ChessMatch {
 		Piece piece = board.removePiece(sourcePosition.toPosition());
 		if (board.thereIsAPiece(targetPosition.toPosition())) {
 			chessPiece = (ChessPiece) board.removePiece(targetPosition.toPosition());
+			if (currentPlayer == Color.WHITE) {
+				blackPiecesOnTheBoard.remove(chessPiece);
+			} else {
+				whitePiecesOnTheBoard.remove(chessPiece);
+			}
 		} 
 		board.placePiece(piece, targetPosition.toPosition());
+		testCheck(piece, chessPiece, sourcePosition, targetPosition);
 		nextTurn();
 		return chessPiece;
 	}
@@ -120,10 +139,8 @@ public class ChessMatch {
 		if (chessPiece != null) {
 			if(chessPiece.getColor() == Color.WHITE) {
 				capturedWhitePieces.add(chessPiece);
-				whitePiecesOnTheBoard.remove(chessPiece);
 			} else {
 				capturedBlackPieces.add(chessPiece);
-				blackPiecesOnTheBoard.remove(chessPiece);
 			}
 		}
 	}
@@ -146,6 +163,54 @@ public class ChessMatch {
 			}
 		}
 		return sb.toString();
+	}
+	
+	public boolean check() {
+		if (currentPlayer == Color.WHITE) {
+			for (ChessPiece blackPiece : blackPiecesOnTheBoard) {
+				if (blackPiece.possibleMove(whiteKingReference)) {
+					return true;
+				}
+			}
+			return false;
+		} else {
+			for (ChessPiece whitePiece : whitePiecesOnTheBoard) {
+				if (whitePiece.possibleMove(blackKingReference)) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+	
+	private void testCheck(Piece piece, ChessPiece chessPiece, ChessPosition sourcePosition, ChessPosition targetPosition) {
+		if (piece.toString() == "K") {
+			if (currentPlayer == Color.WHITE) {
+				whiteKingReference = targetPosition.toPosition();
+			} else {
+				blackKingReference = targetPosition.toPosition();
+			}
+		}
+		if (check()) {
+			board.placePiece(piece, sourcePosition.toPosition());
+			board.removePiece(targetPosition.toPosition());
+			if (chessPiece != null) {
+				board.placePiece(chessPiece, targetPosition.toPosition());
+				if (currentPlayer == Color.WHITE) {
+					blackPiecesOnTheBoard.add(chessPiece);
+				} else {
+					whitePiecesOnTheBoard.add(chessPiece);
+				}
+			}
+			if (piece.toString() == "K") {
+				if (currentPlayer == Color.WHITE) {
+					whiteKingReference = sourcePosition.toPosition();
+				} else {
+					blackKingReference = sourcePosition.toPosition();
+				}
+			}
+			throw new ChessException("You can not put yourself in check");
+		}
 	}
 
 }
