@@ -7,15 +7,15 @@ import chess.ChessException;
 import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import chess.Color;
 
 public class Program {
 
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		ChessMatch chessMatch = new ChessMatch();
-		char answer = 'y';
 
-		while(answer == 'y') {
+		while(true) {
 			try {
 				UI.clearScreen();
 				ChessPiece[][] chessPieces = chessMatch.getPieces();
@@ -25,7 +25,17 @@ public class Program {
 				System.out.println();
 				UI.printBoard(chessPieces);
 				if (chessMatch.check()) {
-					System.out.printf("%n%nYou are in check");
+					if (chessMatch.checkMate()) {
+						System.out.printf("%n%nCheckmate%n");
+						if (chessMatch.getCurrentPlayer() == Color.WHITE) {
+							System.out.printf("The %s player won", Color.BLACK.toString());
+						} else {
+							System.out.printf("The %s player won", Color.WHITE.toString());
+						}
+						break;
+					} else {
+						System.out.printf("%n%nYou are in check");
+					}
 				}
 				System.out.println("\n");
 				System.out.printf("Source position: ");
@@ -48,15 +58,20 @@ public class Program {
 				chessMatch.capturePiece(chessMatch.performChessMove(source, UI.readChessPosition(targetCoordinate)));
 			} catch (BoardException e) {
 				System.out.printf("%s%n", e.getMessage());
+				System.out.printf("%nPress ENTER to continue ");
+				sc.nextLine();
 			} catch (ChessException e) {
 				System.out.printf("%s%n", e.getMessage());
+				System.out.printf("%nPress ENTER to continue ");
+				sc.nextLine();
 			} catch (RuntimeException e) {
 				System.out.printf("Unexpected error%n");
+				System.out.printf("%nPress ENTER to continue ");
+				sc.nextLine();
 			} catch (Exception e) {
 				System.out.printf("Unexpected error%n");
-			} finally {
-				System.out.printf("%nDo you wish to keep playing (y/n)? ");
-				answer = sc.nextLine().charAt(0);
+				System.out.printf("%nPress ENTER to continue ");
+				sc.nextLine();
 			}
 		}
 		
