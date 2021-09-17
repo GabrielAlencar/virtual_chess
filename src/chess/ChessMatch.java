@@ -7,6 +7,7 @@ import boardgame.Board;
 import boardgame.Piece;
 import boardgame.Position;
 import chess.pieces.King;
+import chess.pieces.Pawn;
 import chess.pieces.Rook;
 
 public class ChessMatch {
@@ -61,6 +62,16 @@ public class ChessMatch {
 		whiteKingReference = chessPosition.toPosition();
 		board.placePiece(whiteKing, chessPosition.toPosition());
 		whitePiecesOnTheBoard.add(whiteKing);
+		int row = 2;
+		char column = 'a';
+		Pawn whitePawn;
+		for (int i = 0; i < board.getColumns(); i++) {
+			whitePawn = new Pawn(board, Color.WHITE);
+			chessPosition = new ChessPosition(row, column);
+			board.placePiece(whitePawn, chessPosition.toPosition());
+			whitePiecesOnTheBoard.add(whitePawn);
+			column++;
+		}
 		chessPosition = new ChessPosition(8, 'a');
 		Rook leftBlackRook = new Rook(board, Color.BLACK);
 		board.placePiece(leftBlackRook, chessPosition.toPosition());
@@ -74,6 +85,16 @@ public class ChessMatch {
 		blackKingReference = chessPosition.toPosition();
 		board.placePiece(blackKing, chessPosition.toPosition());
 		blackPiecesOnTheBoard.add(blackKing);
+		row = 7;
+		column = 'a';
+		Pawn blackPawn;
+		for (int i = 0; i < board.getColumns(); i++) {
+			blackPawn = new Pawn(board, Color.BLACK);
+			chessPosition = new ChessPosition(row, column);
+			board.placePiece(blackPawn, chessPosition.toPosition());
+			blackPiecesOnTheBoard.add(blackPawn);
+			column++;
+		}
 	}
 	
 	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
