@@ -189,6 +189,7 @@ public class ChessMatch {
 		if (piece instanceof King) {
 			updateKingTargetReference(targetPosition.toPosition());
 		}
+		((ChessPiece)piece).increaseMoveCount();
 		return capturedPiece;
 	}
 	
@@ -206,6 +207,7 @@ public class ChessMatch {
 				whitePiecesOnTheBoard.add(capturedPiece);
 			}
 		}
+		((ChessPiece)piece).decreaseMoveCount();
 	}
 	
 	private void updateKingTargetReference (Position target) {
