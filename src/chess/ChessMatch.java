@@ -10,6 +10,7 @@ import chess.pieces.Bishop;
 import chess.pieces.King;
 import chess.pieces.Knight;
 import chess.pieces.Pawn;
+import chess.pieces.Queen;
 import chess.pieces.Rook;
 
 public class ChessMatch {
@@ -75,6 +76,10 @@ public class ChessMatch {
 		Bishop rightWhiteBishop = new Bishop(board, Color.WHITE);
 		board.placePiece(rightWhiteBishop, chessPosition.toPosition());
 		whitePiecesOnTheBoard.add(rightWhiteBishop);
+		chessPosition = new ChessPosition(1, 'd');
+		Queen whiteQueen = new Queen(board, Color.WHITE);
+		board.placePiece(whiteQueen, chessPosition.toPosition());
+		whitePiecesOnTheBoard.add(whiteQueen);
 		chessPosition = new ChessPosition(1, 'e');
 		King whiteKing = new King(board, Color.WHITE);
 		whiteKingReference = chessPosition.toPosition();
@@ -114,6 +119,10 @@ public class ChessMatch {
 		Bishop rightBlackBishop = new Bishop(board, Color.BLACK);
 		board.placePiece(rightBlackBishop, chessPosition.toPosition());
 		blackPiecesOnTheBoard.add(leftBlackBishop);
+		chessPosition = new ChessPosition(8, 'd');
+		Queen blackQueen = new Queen(board, Color.BLACK);
+		board.placePiece(blackQueen, chessPosition.toPosition());
+		blackPiecesOnTheBoard.add(blackQueen);
 		chessPosition = new ChessPosition(8, 'e');
 		King blackKing = new King(board, Color.BLACK);
 		blackKingReference = chessPosition.toPosition();
