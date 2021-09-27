@@ -7,6 +7,7 @@ import boardgame.Board;
 import boardgame.Piece;
 import boardgame.Position;
 import chess.pieces.King;
+import chess.pieces.Knight;
 import chess.pieces.Pawn;
 import chess.pieces.Rook;
 
@@ -57,6 +58,14 @@ public class ChessMatch {
 		Rook rightWhiteRook = new Rook(board, Color.WHITE);
 		board.placePiece(rightWhiteRook, chessPosition.toPosition());
 		whitePiecesOnTheBoard.add(rightWhiteRook);
+		chessPosition = new ChessPosition(1, 'b');
+		Knight leftWhiteKnight = new Knight(board, Color.WHITE);
+		board.placePiece(leftWhiteKnight, chessPosition.toPosition());
+		whitePiecesOnTheBoard.add(leftWhiteKnight);
+		chessPosition = new ChessPosition(1, 'g');
+		Knight rightWhiteKnight = new Knight(board, Color.WHITE);
+		board.placePiece(rightWhiteKnight, chessPosition.toPosition());
+		whitePiecesOnTheBoard.add(rightWhiteKnight);
 		chessPosition = new ChessPosition(1, 'e');
 		King whiteKing = new King(board, Color.WHITE);
 		whiteKingReference = chessPosition.toPosition();
@@ -80,6 +89,14 @@ public class ChessMatch {
 		Rook rightBlackRook = new Rook(board, Color.BLACK);
 		board.placePiece(rightBlackRook, chessPosition.toPosition());
 		blackPiecesOnTheBoard.add(rightBlackRook);
+		chessPosition = new ChessPosition(8, 'b');
+		Knight leftBlackKnight = new Knight(board, Color.BLACK);
+		board.placePiece(leftBlackKnight, chessPosition.toPosition());
+		blackPiecesOnTheBoard.add(leftBlackKnight);
+		chessPosition = new ChessPosition(8, 'g');
+		Knight rightBlackKnight = new Knight(board, Color.BLACK);
+		board.placePiece(rightBlackKnight, chessPosition.toPosition());
+		blackPiecesOnTheBoard.add(rightBlackKnight);
 		chessPosition = new ChessPosition(8, 'e');
 		King blackKing = new King(board, Color.BLACK);
 		blackKingReference = chessPosition.toPosition();
