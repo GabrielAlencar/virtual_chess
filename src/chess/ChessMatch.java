@@ -26,18 +26,11 @@ public class ChessMatch {
 	private Position blackKingReference;
 	private Position whiteKingReference;
 	
-	private ChessMatch chessMatch;
-	
 	public ChessMatch() {
 		board = new Board(8, 8);
 		turn = 1;
 		currentPlayer = Color.WHITE;
-		chessMatch = new ChessMatch(board);
 		initialSetup();
-	}
-	
-	private ChessMatch(Board board) {
-		this.board = board;
 	}
 	
 	public int getTurn() {
@@ -88,7 +81,7 @@ public class ChessMatch {
 		board.placePiece(whiteQueen, chessPosition.toPosition());
 		whitePiecesOnTheBoard.add(whiteQueen);
 		chessPosition = new ChessPosition(1, 'e');
-		King whiteKing = new King(board, Color.WHITE, chessMatch);
+		King whiteKing = new King(board, Color.WHITE, this);
 		whiteKingReference = chessPosition.toPosition();
 		board.placePiece(whiteKing, chessPosition.toPosition());
 		whitePiecesOnTheBoard.add(whiteKing);
@@ -131,7 +124,7 @@ public class ChessMatch {
 		board.placePiece(blackQueen, chessPosition.toPosition());
 		blackPiecesOnTheBoard.add(blackQueen);
 		chessPosition = new ChessPosition(8, 'e');
-		King blackKing = new King(board, Color.BLACK, chessMatch);
+		King blackKing = new King(board, Color.BLACK, this);
 		blackKingReference = chessPosition.toPosition();
 		board.placePiece(blackKing, chessPosition.toPosition());
 		blackPiecesOnTheBoard.add(blackKing);
