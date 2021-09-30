@@ -26,11 +26,18 @@ public class ChessMatch {
 	private Position blackKingReference;
 	private Position whiteKingReference;
 	
+	private ChessMatch chessMatch;
+	
 	public ChessMatch() {
 		board = new Board(8, 8);
 		turn = 1;
 		currentPlayer = Color.WHITE;
+		chessMatch = new ChessMatch(board);
 		initialSetup();
+	}
+	
+	private ChessMatch(Board board) {
+		this.board = board;
 	}
 	
 	public int getTurn() {
@@ -81,7 +88,7 @@ public class ChessMatch {
 		board.placePiece(whiteQueen, chessPosition.toPosition());
 		whitePiecesOnTheBoard.add(whiteQueen);
 		chessPosition = new ChessPosition(1, 'e');
-		King whiteKing = new King(board, Color.WHITE);
+		King whiteKing = new King(board, Color.WHITE, chessMatch);
 		whiteKingReference = chessPosition.toPosition();
 		board.placePiece(whiteKing, chessPosition.toPosition());
 		whitePiecesOnTheBoard.add(whiteKing);
@@ -118,13 +125,13 @@ public class ChessMatch {
 		chessPosition = new ChessPosition(8, 'f');
 		Bishop rightBlackBishop = new Bishop(board, Color.BLACK);
 		board.placePiece(rightBlackBishop, chessPosition.toPosition());
-		blackPiecesOnTheBoard.add(leftBlackBishop);
+		blackPiecesOnTheBoard.add(rightBlackBishop);
 		chessPosition = new ChessPosition(8, 'd');
 		Queen blackQueen = new Queen(board, Color.BLACK);
 		board.placePiece(blackQueen, chessPosition.toPosition());
 		blackPiecesOnTheBoard.add(blackQueen);
 		chessPosition = new ChessPosition(8, 'e');
-		King blackKing = new King(board, Color.BLACK);
+		King blackKing = new King(board, Color.BLACK, chessMatch);
 		blackKingReference = chessPosition.toPosition();
 		board.placePiece(blackKing, chessPosition.toPosition());
 		blackPiecesOnTheBoard.add(blackKing);
@@ -161,9 +168,14 @@ public class ChessMatch {
 		if (!board.piece(sourcePosition.toPosition()).possibleMove(targetPosition.toPosition())) {
 			throw new ChessException("Target position is not a possible move");
 		}
-		Piece piece = board.removePiece(sourcePosition.toPosition());
-		chessPiece = makeMove(piece, sourcePosition, targetPosition);
-		testCheck(piece, chessPiece, sourcePosition, targetPosition);
+		Piece piece;
+		if (wasCastlingChosen(sourcePosition, targetPosition)) {
+			performCastling(sourcePosition, targetPosition);
+		} else {
+			piece = board.removePiece(sourcePosition.toPosition());
+			chessPiece = makeMove(piece, sourcePosition, targetPosition);
+			testCheck(piece, chessPiece, sourcePosition, targetPosition);
+		}
 		nextTurn();
 		return chessPiece;
 	}
@@ -329,7 +341,11 @@ public class ChessMatch {
 			for (int i = 0; i < movesOfKing.length; i++) {
 				for (int j = 0; j < movesOfKing[0].length; j++) {
 					if (movesOfKing[i][j] == true) {
-						possibleMovesOfKing.add(new Position(i, j));
+						if(currentPlayer == Color.WHITE && Math.abs(j - whiteKingReference.getColumn()) < 2) {
+							possibleMovesOfKing.add(new Position(i, j));
+						} else if (currentPlayer == Color.BLACK && Math.abs(j - blackKingReference.getColumn()) < 2) {
+							possibleMovesOfKing.add(new Position(i, j));
+						}
 					}
 				}
 			}
@@ -397,5 +413,85 @@ public class ChessMatch {
 			return false;
 		}
 	}
-
+	
+	public boolean hasPieceMoved(Piece piece) {
+		if (((ChessPiece)piece).getMoveCount() > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private boolean wasCastlingChosen(ChessPosition sourcePosition, ChessPosition targetPosition) {
+		Position source = sourcePosition.toPosition();
+		Position target = targetPosition.toPosition();
+		Piece piece = board.piece(source);
+		if (piece instanceof King) {
+			if (Math.abs(target.getColumn() - source.getColumn()) == 2) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
+	private void performCastling(ChessPosition sourcePosition, ChessPosition targetPosition) {
+		Position source = sourcePosition.toPosition();
+		Position target = targetPosition.toPosition();
+		boolean typeOfCastling;
+		Position position = new Position(source.getRow(), source.getColumn());
+		Piece king;
+		Piece rook;
+		if (check()) {
+			throw new ChessException("You can not perform castling if you are in check");
+		} else {
+			//typeOfCastling equals true if the left rook needs to be moved to perform castling, and 
+			//equals false in case the right rook is involved
+			if (target.getColumn() - source.getColumn() == -2) {
+				typeOfCastling = true;
+			} else {
+				typeOfCastling = false;
+			}
+			if (typeOfCastling == true) {
+				for (int i = 1; source.getColumn() - i >= target.getColumn(); i++) {
+					position.setColumn(source.getColumn() - i);
+					king = board.removePiece(source);
+					makeMove(king, sourcePosition, ChessPosition.fromPosition(position));
+					if (check()) {
+						undoMove(king, null, sourcePosition, ChessPosition.fromPosition(position));
+						throw new ChessException("You can not put yourself in check while castling");
+					}
+					undoMove(king, null, sourcePosition, ChessPosition.fromPosition(position));
+				}
+				king = board.removePiece(source);
+				makeMove(king, sourcePosition, targetPosition);
+				position.setColumn(0);
+				rook = board.removePiece(position);
+				position.setColumn(3);
+				board.placePiece(rook, position);
+				((ChessPiece)rook).increaseMoveCount();
+			} else {
+				for (int i = 1; source.getColumn() + i <= target.getColumn(); i++) {
+					position.setColumn(source.getColumn() + i);
+					king = board.removePiece(source);
+					makeMove(king, sourcePosition, ChessPosition.fromPosition(position));
+					if (check()) {
+						undoMove(king, null, sourcePosition, ChessPosition.fromPosition(position));
+						throw new ChessException("You can not put yourself in check while castling");
+					}
+					undoMove(king, null, sourcePosition, ChessPosition.fromPosition(position));
+				}
+				king = board.removePiece(source);
+				makeMove(king, sourcePosition, targetPosition);
+				position.setColumn(board.getColumns() - 1);
+				rook = board.removePiece(position);
+				position.setColumn(board.getColumns() - 3);
+				board.placePiece(rook, position);
+				((ChessPiece)rook).increaseMoveCount();
+			}
+			
+		}
+	}
 }
