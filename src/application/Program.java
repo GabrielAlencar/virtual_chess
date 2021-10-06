@@ -1,5 +1,6 @@
 package application;
 
+import java.security.InvalidParameterException;
 import java.util.Scanner;
 
 import boardgame.BoardException;
@@ -56,6 +57,39 @@ public class Program {
 				System.out.printf("Target position: ");
 				String targetCoordinate = sc.nextLine();
 				chessMatch.capturePiece(chessMatch.performChessMove(source, UI.readChessPosition(targetCoordinate)));
+				if (chessMatch.wasPromotionMade()) {
+					chessPieces = chessMatch.getPieces();
+					UI.clearScreen();
+					System.out.printf("Turn: %d%n", chessMatch.getTurn());
+					System.out.printf("Current player: %s%n", chessMatch.getCurrentPlayer());
+					UI.printCapturedPieces(chessMatch.getCapturedPieces(), chessMatch.getCurrentPlayer());
+					System.out.println();
+					UI.printBoard(chessPieces);
+					System.out.println("\n");
+					System.out.printf("The pawn at coordinate %s has been promoted%n", chessMatch.getPromotedPawnPosition().toString());
+					System.out.printf("Choose one of the following pieces to substitute it: N, B, R, Q%n");
+					char answer = ' ';
+					while(answer != 'N' && answer != 'B' && answer != 'R' && answer != 'Q') {
+						try {
+							answer = sc.nextLine().charAt(0);
+							UI.verifyPromotionAnswer(answer);
+						} catch (InvalidParameterException e) {
+							System.out.printf("%s%n", e.getMessage());
+							System.out.printf("%nPress ENTER to continue ");
+							sc.nextLine();
+							UI.clearScreen();
+							System.out.printf("Turn: %d%n", chessMatch.getTurn());
+							System.out.printf("Current player: %s%n", chessMatch.getCurrentPlayer());
+							UI.printCapturedPieces(chessMatch.getCapturedPieces(), chessMatch.getCurrentPlayer());
+							System.out.println();
+							UI.printBoard(chessPieces);
+							System.out.println("\n");
+							System.out.printf("The pawn at coordinate %s has been promoted%n", chessMatch.getPromotedPawnPosition().toString());
+							System.out.printf("Choose one of the following pieces to substitute it: N, B, R, Q%n");	
+						}
+					}
+					chessMatch.performPromotion(UI.getChosenPromotedPiece(answer));
+				}
 			} catch (BoardException e) {
 				System.out.printf("%s%n", e.getMessage());
 				System.out.printf("%nPress ENTER to continue ");

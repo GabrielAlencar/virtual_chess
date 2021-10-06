@@ -1,8 +1,14 @@
 package application;
 
+import java.security.InvalidParameterException;
+
 import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.Color;
+import chess.pieces.Bishop;
+import chess.pieces.Knight;
+import chess.pieces.Queen;
+import chess.pieces.Rook;
 
 public class UI {
 
@@ -107,5 +113,24 @@ public class UI {
 		}
 		
 	}
-
+	
+	public static void verifyPromotionAnswer(char answer) {
+		if (answer != 'N' && answer != 'B' && answer != 'R' && answer != 'Q') {
+			throw new InvalidParameterException("Invalid input");
+		}
+	}
+	
+	public static ChessPiece getChosenPromotedPiece(char answer) {
+		ChessPiece chosenPromotedPiece = null;
+		if (answer == 'N') {
+			chosenPromotedPiece = new Knight(null, null);
+		} else if (answer == 'B') {
+			chosenPromotedPiece = new Bishop(null, null);
+		} else if (answer == 'R') {
+			chosenPromotedPiece = new Rook(null, null);
+		} else if (answer == 'Q') {
+			chosenPromotedPiece = new Queen(null, null);
+		}
+		return chosenPromotedPiece;
+	}
 }

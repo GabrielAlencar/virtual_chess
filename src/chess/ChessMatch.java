@@ -30,6 +30,9 @@ public class ChessMatch {
 	private Position enPassantPawnPosition;
 	private int enPassantTurnCounter;
 	
+	private boolean promotionStatus;
+	private Position promotedPawnPosition;
+	
 	public ChessMatch() {
 		board = new Board(8, 8);
 		turn = 1;
@@ -37,6 +40,8 @@ public class ChessMatch {
 		enPassant = false;
 		enPassantPawnPosition = null;
 		enPassantTurnCounter = 0;
+		promotionStatus = false;
+		promotedPawnPosition = null;
 		initialSetup();
 	}
 	
@@ -58,6 +63,14 @@ public class ChessMatch {
 	
 	public int getEnPassantTurnCounter() {
 		return enPassantTurnCounter;
+	}
+	
+	public boolean wasPromotionMade() {
+		return promotionStatus;
+	}
+	
+	public ChessPosition getPromotedPawnPosition() {
+		return ChessPosition.fromPosition(promotedPawnPosition);
 	}
 	
 	public ChessPiece[][] getPieces() {
@@ -190,9 +203,60 @@ public class ChessMatch {
 			chessPiece = makeMove(piece, sourcePosition, targetPosition);
 			testCheck(piece, chessPiece, sourcePosition, targetPosition);
 			verifyEnPassantCondition(piece, sourcePosition, targetPosition);
+			verifyPromotionStatus(piece, targetPosition);
 		}
-		nextTurn();
+		if (promotionStatus == false) {
+			nextTurn();
+		}
 		return chessPiece;
+	}
+	
+	public void performPromotion(ChessPiece chosenPromotedPiece) {
+		if (promotionStatus == true) {
+			Piece promotedPawn = board.removePiece(promotedPawnPosition);
+			Color promotedPawnColor = ((ChessPiece)promotedPawn).getColor();
+			if (promotedPawnColor == Color.WHITE) {
+				whitePiecesOnTheBoard.remove(promotedPawn);
+			} else {
+				blackPiecesOnTheBoard.remove(promotedPawn);
+			}
+			if (chosenPromotedPiece instanceof Knight) {
+				Knight knight = new Knight(board, promotedPawnColor);
+				board.placePiece(knight, promotedPawnPosition);
+				if (promotedPawnColor == Color.WHITE) {
+					whitePiecesOnTheBoard.add(knight);
+				} else {
+					blackPiecesOnTheBoard.add(knight);
+				}
+			} else if (chosenPromotedPiece instanceof Bishop) {
+				Bishop bishop = new Bishop(board, promotedPawnColor);
+				board.placePiece(bishop, promotedPawnPosition);
+				if (promotedPawnColor == Color.WHITE) {
+					whitePiecesOnTheBoard.add(bishop);
+				} else {
+					blackPiecesOnTheBoard.add(bishop);
+				}
+			} else if (chosenPromotedPiece instanceof Rook) {
+				Rook rook = new Rook(board, promotedPawnColor);
+				board.placePiece(rook, promotedPawnPosition);
+				if (promotedPawnColor == Color.WHITE) {
+					whitePiecesOnTheBoard.add(rook);
+				} else {
+					blackPiecesOnTheBoard.add(rook);
+				}
+			} else if (chosenPromotedPiece instanceof Queen) {
+				Queen queen = new Queen(board, promotedPawnColor);
+				board.placePiece(queen, promotedPawnPosition);
+				if (promotedPawnColor == Color.WHITE) {
+					whitePiecesOnTheBoard.add(queen);
+				} else {
+					blackPiecesOnTheBoard.add(queen);
+				}
+			}
+			promotionStatus = false;
+			promotedPawnPosition = null;
+			nextTurn();
+		}
 	}
 	
 	public boolean[][] getPossibleMoves(ChessPosition chessPosition) {
@@ -559,5 +623,13 @@ public class ChessMatch {
 			whitePiecesOnTheBoard.remove((ChessPiece)opponentPawn);
 		}
 		return (ChessPiece)opponentPawn;
+	}
+	
+	private void verifyPromotionStatus(Piece piece, ChessPosition targetPosition) {
+		Position target = targetPosition.toPosition();
+		if (piece instanceof Pawn && (target.getRow() == 0 || target.getRow() == board.getRows() - 1)) {
+			promotionStatus = true;
+			promotedPawnPosition = ((ChessPiece)piece).getChessPosition().toPosition();
+		}
 	}
 }
