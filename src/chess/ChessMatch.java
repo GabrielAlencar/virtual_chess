@@ -196,8 +196,6 @@ public class ChessMatch {
 		Piece piece = null;
 		if (wasCastlingChosen(sourcePosition, targetPosition)) {
 			performCastling(sourcePosition, targetPosition);
-		} else if (wasEnPassantChosen(sourcePosition, targetPosition)) {
-			chessPiece = performEnPassant(sourcePosition, targetPosition);
 		} else {
 			piece = board.removePiece(sourcePosition.toPosition());
 			chessPiece = makeMove(piece, sourcePosition, targetPosition);
@@ -341,34 +339,42 @@ public class ChessMatch {
 	
 	private ChessPiece makeMove(Piece piece, ChessPosition sourcePosition, ChessPosition targetPosition) {
 		ChessPiece capturedPiece = null;
-		if (board.thereIsAPiece(targetPosition.toPosition())) {
-			capturedPiece = (ChessPiece) board.removePiece(targetPosition.toPosition());
-			if (currentPlayer == Color.WHITE) {
-				blackPiecesOnTheBoard.remove(capturedPiece);
-			} else {
-				whitePiecesOnTheBoard.remove(capturedPiece);
+		if (wasEnPassantChosen(piece, sourcePosition, targetPosition)) {
+			capturedPiece = performEnPassant(piece, sourcePosition, targetPosition);
+		} else {
+			if (board.thereIsAPiece(targetPosition.toPosition())) {
+				capturedPiece = (ChessPiece) board.removePiece(targetPosition.toPosition());
+				if (currentPlayer == Color.WHITE) {
+					blackPiecesOnTheBoard.remove(capturedPiece);
+				} else {
+					whitePiecesOnTheBoard.remove(capturedPiece);
+				}
+			} 
+			board.placePiece(piece, targetPosition.toPosition());
+			if (piece instanceof King) {
+				updateKingTargetReference(targetPosition.toPosition());
 			}
-		} 
-		board.placePiece(piece, targetPosition.toPosition());
-		if (piece instanceof King) {
-			updateKingTargetReference(targetPosition.toPosition());
-		} 
+		}
 		((ChessPiece)piece).increaseMoveCount();
 		return capturedPiece;
 	}
 	
 	private void undoMove(Piece piece, ChessPiece capturedPiece, ChessPosition sourcePosition, ChessPosition targetPosition) {
-		board.placePiece(piece, sourcePosition.toPosition());
 		board.removePiece(targetPosition.toPosition());
-		if (piece instanceof King) {
-			updateKingSourceReference(sourcePosition.toPosition());
-		} 
-		if (capturedPiece != null) {
-			board.placePiece(capturedPiece, targetPosition.toPosition());
-			if (currentPlayer == Color.WHITE) {
-				blackPiecesOnTheBoard.add(capturedPiece);
-			} else {
-				whitePiecesOnTheBoard.add(capturedPiece);
+		if (wasEnPassantChosen(piece, sourcePosition, targetPosition)) {
+			undoEnPassant(piece, capturedPiece, sourcePosition, targetPosition);
+		} else {
+			board.placePiece(piece, sourcePosition.toPosition());
+			if (piece instanceof King) {
+				updateKingSourceReference(sourcePosition.toPosition());
+			} 
+			if (capturedPiece != null) {
+				board.placePiece(capturedPiece, targetPosition.toPosition());
+				if (currentPlayer == Color.WHITE) {
+					blackPiecesOnTheBoard.add(capturedPiece);
+				} else {
+					whitePiecesOnTheBoard.add(capturedPiece);
+				}
 			}
 		}
 		((ChessPiece)piece).decreaseMoveCount();
@@ -397,7 +403,7 @@ public class ChessMatch {
 		}
 	}
 	
-	private List<Position> getPossibleMovesForThePiece(ChessPiece piece, ChessPiece opponentPiece) {
+	private List<Position> getCommonPossibleMovesBetweenPieces(ChessPiece piece, ChessPiece opponentPiece) {
 		//Possible moves for the piece to protect the king
 		List<Position> possibleMovesForThePiece = new ArrayList<>();
 		boolean[][] pieceMoves = piece.possibleMoves();
@@ -482,23 +488,63 @@ public class ChessMatch {
 				ChessPiece capturedPiece = null;
 				List<Position> possibleMovesForThePiece = new ArrayList<>();
 				ChessPosition sourcePosition = new ChessPosition(piece.getChessPosition().getRow(), piece.getChessPosition().getColumn());
-				for (ChessPiece opponentPiece : opponentPiecesThreateningTheKing) {
-					possibleMovesForThePiece = getPossibleMovesForThePiece(piece, opponentPiece);
-					for (Position target : possibleMovesForThePiece) {
-						board.removePiece(sourcePosition.toPosition());
-						capturedPiece = makeMove(piece, sourcePosition, ChessPosition.fromPosition(target));
-						if (!check()) {
+				if (piece instanceof King) {
+					continue;
+				} else {
+					for (ChessPiece opponentPiece : opponentPiecesThreateningTheKing) {
+						possibleMovesForThePiece = getCommonPossibleMovesBetweenPieces(piece, opponentPiece);
+						for (Position target : possibleMovesForThePiece) {
+							board.removePiece(sourcePosition.toPosition());
+							capturedPiece = makeMove(piece, sourcePosition, ChessPosition.fromPosition(target));
+							if (!check()) {
+								undoMove(piece, capturedPiece, sourcePosition, ChessPosition.fromPosition(target));
+								return false;
+							}
 							undoMove(piece, capturedPiece, sourcePosition, ChessPosition.fromPosition(target));
-							return false;
 						}
-						undoMove(piece, capturedPiece, sourcePosition, ChessPosition.fromPosition(target));
+						
 					}
-					
 				}
 			}
 			return true;
 		} else {
 			return false;
+		}
+	}
+	
+	public boolean stalemate() {
+		if (check()) {
+			return false;
+		} else {
+			List<ChessPiece> piecesOnBoard = new ArrayList<>();
+			if (currentPlayer == Color.WHITE) {
+				piecesOnBoard = whitePiecesOnTheBoard;
+			} else {
+				piecesOnBoard = blackPiecesOnTheBoard;
+			}
+			for (ChessPiece pieceOnBoard : piecesOnBoard) {
+				boolean[][] possibleMovesOfPiece;
+				possibleMovesOfPiece = pieceOnBoard.possibleMoves();
+				Piece piece = null;
+				ChessPiece capturedPiece = null;
+				ChessPosition source = pieceOnBoard.getChessPosition();
+				ChessPosition target = null;
+				for (int i = 0; i < possibleMovesOfPiece.length; i++) {
+					for (int j = 0; j < possibleMovesOfPiece[0].length; j++) {
+						if (possibleMovesOfPiece[i][j] == true) {
+							target = ChessPosition.fromPosition(new Position(i, j));
+							piece = board.removePiece(source.toPosition());
+							capturedPiece = makeMove(piece, source, target);
+							if (!check()) {
+								undoMove(piece, capturedPiece, source, target);
+								return false;
+							}
+							undoMove(piece, capturedPiece, source, target);
+						}
+					}
+				}
+			}
+			return true;
 		}
 	}
 	
@@ -593,10 +639,9 @@ public class ChessMatch {
 		}
 	}
 	
-	private boolean wasEnPassantChosen(ChessPosition sourcePosition, ChessPosition targetPosition) {
+	private boolean wasEnPassantChosen(Piece piece, ChessPosition sourcePosition, ChessPosition targetPosition) {
 		Position source = sourcePosition.toPosition();
 		Position target = targetPosition.toPosition();
-		Piece piece = board.piece(source);
 		if (piece instanceof Pawn && Math.abs(target.getRow() - source.getRow()) == 1 && Math.abs(target.getColumn() - source.getColumn()) == 1 && !board.thereIsAPiece(target)) {
 			return true;
 		} else {
@@ -604,25 +649,31 @@ public class ChessMatch {
 		}
 	}
 	
-	private ChessPiece performEnPassant(ChessPosition sourcePosition, ChessPosition targetPosition) {
+	private ChessPiece performEnPassant(Piece pawn, ChessPosition sourcePosition, ChessPosition targetPosition) {
 		Position source = sourcePosition.toPosition();
 		Position target = targetPosition.toPosition();
 		Position opponentPawnPosition = new Position(source.getRow(), target.getColumn());
-		Piece pawn = board.removePiece(source);
 		Piece opponentPawn = board.removePiece(opponentPawnPosition);
 		board.placePiece(pawn, target);
-		if (check()) {
-			board.removePiece(target);
-			board.placePiece(pawn, source);
-			board.placePiece(opponentPawn, opponentPawnPosition);
-			throw new ChessException("You can not put yourself in check");
-		}
 		if (currentPlayer == Color.WHITE) {
 			blackPiecesOnTheBoard.remove((ChessPiece)opponentPawn);
 		} else {
 			whitePiecesOnTheBoard.remove((ChessPiece)opponentPawn);
 		}
 		return (ChessPiece)opponentPawn;
+	}
+	
+	private void undoEnPassant(Piece pawn, ChessPiece opponentPawn, ChessPosition sourcePosition, ChessPosition targetPosition) {
+		Position source = sourcePosition.toPosition();
+		Position target = targetPosition.toPosition();
+		Position opponentPawnPosition = new Position(source.getRow(), target.getColumn());
+		board.placePiece(pawn, source);
+		board.placePiece(opponentPawn, opponentPawnPosition);
+		if (currentPlayer == Color.WHITE) {
+			blackPiecesOnTheBoard.add(opponentPawn);
+		} else {
+			whitePiecesOnTheBoard.add(opponentPawn);
+		}
 	}
 	
 	private void verifyPromotionStatus(Piece piece, ChessPosition targetPosition) {

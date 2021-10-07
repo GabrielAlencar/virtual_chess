@@ -37,6 +37,10 @@ public class Program {
 					} else {
 						System.out.printf("%n%nYou are in check");
 					}
+				} else if (chessMatch.stalemate()) {
+					System.out.printf("%n%nStalemate%n");
+					System.out.printf("The match ended in a draw");
+					break;
 				}
 				System.out.println("\n");
 				System.out.printf("Source position: ");
