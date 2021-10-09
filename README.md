@@ -1,6 +1,6 @@
 # Gabriel's Virtual Chess Game
 
-This project was inspired on one of the systems developed by PhD. Nélio Muniz Mendes Alves (you can check it on https://github.com/acenelio/chess-system-java). It is important to state that the application must be executed in a GIT terminal to guarantee the correct printing of the board and its pieces.
+This project was inspired on one of the repositories developed by PhD. Nélio Muniz Mendes Alves (you can check it on https://github.com/acenelio/chess-system-java). It is important to state that the application must be executed in a GIT terminal to guarantee the correct printing of the board and its pieces.
 
 Here is some useful information:
 
