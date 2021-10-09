@@ -1,6 +1,7 @@
 package application;
 
 import java.security.InvalidParameterException;
+import java.util.Scanner;
 
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -132,5 +133,17 @@ public class UI {
 			chosenPromotedPiece = new Queen(null, null);
 		}
 		return chosenPromotedPiece;
+	}
+	
+	public static void initialScreen(Scanner sc, ChessPiece[][] chessPieces) {
+		System.out.printf("WELCOME TO GABRIEL's VIRTUAL CHESS GAME!!!%n%n");
+		printBoard(chessPieces);
+		System.out.printf("%n%nHere is some useful information:%n%n");
+		System.out.printf("- The players can perform all of the special moves (castling, en passant and promotion)%n%n");
+		System.out.printf("- A player can type the source position where the target position is required, in order to reset the selection and check another piece%n%n");
+		System.out.printf("- The match automatically stops when a Checkmate or a Stalemate (draw) is detected%n%n");
+		System.out.printf("- Press Ctrl+C to stop the match%n%n");
+		System.out.printf("%sPress ENTER to start the match%s", ANSI_GREEN, ANSI_RESET);
+		sc.nextLine();
 	}
 }

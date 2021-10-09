@@ -15,11 +15,14 @@ public class Program {
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		ChessMatch chessMatch = new ChessMatch();
+		ChessPiece[][] chessPieces = chessMatch.getPieces();
+		UI.clearScreen();
+		UI.initialScreen(sc, chessPieces);
 		
 		while(true) {
 			try {
 				UI.clearScreen();
-				ChessPiece[][] chessPieces = chessMatch.getPieces();
+				chessPieces = chessMatch.getPieces();
 				System.out.printf("Turn: %d%n", chessMatch.getTurn());
 				System.out.printf("Current player: %s%n", chessMatch.getCurrentPlayer());
 				UI.printCapturedPieces(chessMatch.getCapturedPieces(), chessMatch.getCurrentPlayer());
@@ -38,7 +41,7 @@ public class Program {
 						System.out.printf("%n%nYou are in check");
 					}
 				} else if (chessMatch.stalemate()) {
-					System.out.printf("%n%nStalemate%n");
+					System.out.printf("%n%nStalemate: the %s pieces have no legal move%n", chessMatch.getCurrentPlayer().toString());
 					System.out.printf("The match ended in a draw");
 					break;
 				}
@@ -60,6 +63,9 @@ public class Program {
 				System.out.printf("Source position: %s%n", sourceCoordinate);
 				System.out.printf("Target position: ");
 				String targetCoordinate = sc.nextLine();
+				if (targetCoordinate.equals(sourceCoordinate)) {
+					continue;
+				}
 				chessMatch.capturePiece(chessMatch.performChessMove(source, UI.readChessPosition(targetCoordinate)));
 				if (chessMatch.wasPromotionMade()) {
 					chessPieces = chessMatch.getPieces();
